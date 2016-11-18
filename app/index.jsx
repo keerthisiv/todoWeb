@@ -1,15 +1,16 @@
 import React from 'react';
 import {render} from 'react-dom';
 import Task from './task';
+import TodoFooter from './TodoFooter';
 import 'whatwg-fetch';
+var R = require('ramda');
 
 const ENTER_KEY = 13;
-const ESCAPE_KEY = 27;
 
 class App extends React.Component {
   constructor() {
     super()
-    this.state = {todos: [], newTodo: '', toggleAll: false}
+    this.state = {todos: [], newTodo: '', toggleAll: false, selectedOption: 'All'}
   }
 
   componentDidMount() {
@@ -18,8 +19,28 @@ class App extends React.Component {
       .then(body => this.setState({todos: body}))
   }
 
+  activeTasks = () => {
+    let isActive = n => n["completed"] === false;
+    return R.filter(isActive, this.state.todos) || []
+  }
+
+  completedTasks = () => {
+    let isCompleted = n => n["completed"] === true;
+    return R.filter(isCompleted, this.state.todos) || []
+  }
+
   handleChange = (event) => {
     this.setState({newTodo: event.target.value});
+  }
+
+  showTasks = () => {
+    if (this.state.selectedOption == 'Active') {
+      return this.activeTasks()
+    } else if (this.state.selectedOption == 'Completed') {
+      return this.completedTasks()
+    } else {
+      return this.state.todos
+    }
   }
 
   toggleAll = () => {
@@ -107,8 +128,12 @@ class App extends React.Component {
     .then(body => this.setState({todos: body}))
   }
 
+  setSelection = (selection) => {
+    this.setState({selectedOption: selection})
+  }
+
   render () {
-    var todoItems = this.state.todos.map( todo => {
+    var todoItems = this.showTasks().map( todo => {
       return (
           <Task
             description={todo.description}
@@ -135,7 +160,17 @@ class App extends React.Component {
           </ul>
         </section>
       )
+
+      var footer =  (
+          <TodoFooter
+            count={this.activeTasks().length}
+            completedCount={this.completedTasks().length}
+            selected={this.setSelection}
+            selection={this.state.selectedOption}
+          />
+      )
     }
+
 
     return (
       <div>
@@ -152,7 +187,7 @@ class App extends React.Component {
         />
       </header>
       {mainSection}
-
+      {footer}
       </section>
       </div>
     )

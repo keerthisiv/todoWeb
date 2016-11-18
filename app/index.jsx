@@ -3,12 +3,13 @@ import {render} from 'react-dom';
 import Task from './task';
 import 'whatwg-fetch';
 
-const ENTER_KEY = 13
+const ENTER_KEY = 13;
+const ESCAPE_KEY = 27;
 
 class App extends React.Component {
   constructor() {
     super()
-    this.state = {todos: [], newTodo: ''}
+    this.state = {todos: [], newTodo: '', toggleAll: false}
   }
 
   componentDidMount() {
@@ -19,6 +20,22 @@ class App extends React.Component {
 
   handleChange = (event) => {
     this.setState({newTodo: event.target.value});
+  }
+
+  toggleAll = () => {
+    let toggleState = this.state.toggleAll;
+    fetch('http://127.0.0.1:3000/tasks_toggle_all', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          toggle: toggleState,
+        })
+      }).then(response => response.json())
+        .then(body => this.setState({todos: body, toggleAll: !toggleState}))
   }
 
   toggle = (id) => {
@@ -75,7 +92,20 @@ class App extends React.Component {
     }
   }
 
-
+  update = (id, newDesc) => {
+    fetch("http://127.0.0.1:3000/tasks_update/" + id, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        description: newDesc
+      })
+    }).then(response => response.json())
+    .then(body => this.setState({todos: body}))
+  }
 
   render () {
     var todoItems = this.state.todos.map( todo => {
@@ -87,6 +117,7 @@ class App extends React.Component {
             id={todo.id}
             onToggle={this.toggle}
             onDestroy={this.destroy}
+            updateTask={this.update}
             />
           )
     });

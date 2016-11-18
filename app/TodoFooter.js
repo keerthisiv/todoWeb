@@ -4,8 +4,17 @@ import {render} from 'react-dom';
 export default class TodoFooter extends React.Component {
 
   render() {
+    if (this.props.completedCount > 0) {
+      var clearButton = (
+          <button
+            className="clear-completed"
+            onClick={this.props.onClearCompleted}>
+            Clear completed
+          </button>
+        );
+    }
 
-    var liSelections = ['All', 'Active', 'Completed'].map( selection => {
+    const liSelections = ['All', 'Active', 'Completed'].map( selection => {
       return (
             <li key={selection} >
               <a
@@ -27,6 +36,7 @@ export default class TodoFooter extends React.Component {
           <ul className="filters">
             {liSelections}
           </ul>
+          {clearButton}
         </footer>
           );
   }

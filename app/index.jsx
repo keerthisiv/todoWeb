@@ -128,6 +128,18 @@ class App extends React.Component {
     .then(body => this.setState({todos: body}))
   }
 
+  clearCompletedTasks = () => {
+    fetch("http://127.0.0.1:3000/clear_completed/", {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Origin': '*'
+      }
+    }).then(response => response.json())
+    .then(body => this.setState({todos: body}))
+  }
+
   setSelection = (selection) => {
     this.setState({selectedOption: selection})
   }
@@ -167,6 +179,7 @@ class App extends React.Component {
             completedCount={this.completedTasks().length}
             selected={this.setSelection}
             selection={this.state.selectedOption}
+            onClearCompleted={this.clearCompletedTasks}
           />
       )
     }

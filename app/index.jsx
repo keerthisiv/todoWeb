@@ -14,7 +14,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch('http://127.0.0.1:3000/tasks.json')
+    fetch('http://127.0.0.1:3000/tasks')
       .then(response => response.json())
       .then(body => this.setState({todos: body}))
   }
@@ -114,14 +114,15 @@ class App extends React.Component {
   }
 
   update = (id, newDesc) => {
-    fetch("http://127.0.0.1:3000/tasks_update/" + id, {
-      method: 'POST',
+    fetch("http://127.0.0.1:3000/tasks_update/", {
+      method: 'PUT',
       headers: {
         'Accept': 'application/json',
         'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
+        task_id: id,
         description: newDesc
       })
     }).then(response => response.json())
